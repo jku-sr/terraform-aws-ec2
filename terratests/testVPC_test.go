@@ -16,7 +16,7 @@ func TestVPC(t *testing.T) {
 
 	terraformOptions := &terraform.Options{
 		// The path to where our Terraform code is located
-		TerraformDir: "../modules/terraform-aws-vpc",
+		TerraformDir: "../modules/vpc",
 
 		// Variables to pass to our Terraform code using -var options
 		Vars: map[string]interface{}{
