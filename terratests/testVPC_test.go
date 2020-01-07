@@ -47,8 +47,8 @@ func TestVPC(t *testing.T) {
 	})
 
 	subnets := aws.GetSubnetsForVpc(t, vpcID, awsRegion)
-	t.Run("more than 1 subnet", func(t *testing.T) {
-		if len(subnets) < 2 {
+	t.Run("less than 1 subnet", func(t *testing.T) {
+		if len(subnets) < 1 {
 			t.Error("only 1 subnet deployed")
 		}
 	})
