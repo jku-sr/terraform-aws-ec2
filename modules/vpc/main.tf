@@ -12,7 +12,7 @@ resource "aws_vpc" "this" {
 
 # Subnets
 resource "aws_subnet" "public" {
-  count                   = var.has_multiple_subnets ? var.public_subnet_count : length(var.availability_zones)
+  count = var.has_multiple_subnets ? var.public_subnet_count : length(var.availability_zones)
 
   vpc_id                  = aws_vpc.this.id
   cidr_block              = cidrsubnet(var.cidr_block, 8, count.index)
@@ -77,16 +77,18 @@ resource "aws_route" "ngw" {
   route_table_id         = element(aws_route_table.private.*.id, count.index)
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = element(aws_nat_gateway.private.*.id, count.index)
-  depends_on             = [aws_route_table.private]
 
   timeouts {
     create = "5m"
+    delete = "5m"
   }
+
+  depends_on = [aws_route_table.private]
 }
 
 // associate public subnet(s) with route table above
 resource "aws_route_table_association" "private" {
-  count          = var.has_multiple_subnets ? var.private_subnet_count : length(var.availability_zones)
+  count = var.has_multiple_subnets ? var.private_subnet_count : length(var.availability_zones)
 
   subnet_id      = element(aws_subnet.private.*.id, count.index)
   route_table_id = element(aws_route_table.private.*.id, count.index)
@@ -99,10 +101,12 @@ resource "aws_route_table" "public" {
   tags = merge({
     Name = format("public-subnet-route-table-%v", element(var.availability_zones, 0))
   }, var.default_tags)
+
+  depends_on = [aws_subnet.public]
 }
 
 resource "aws_route" "igw" {
-  count                  = var.has_multiple_subnets ? var.public_subnet_count : length(var.availability_zones)
+  count = var.has_multiple_subnets ? var.public_subnet_count : length(var.availability_zones)
 
   route_table_id         = element(aws_route_table.public.*.id, count.index)
   destination_cidr_block = "0.0.0.0/0"
@@ -110,12 +114,15 @@ resource "aws_route" "igw" {
 
   timeouts {
     create = "5m"
+    delete = "5m"
   }
+
+  depends_on = [aws_route_table.public]
 }
 
 # associate public subnet(s) with route table above
 resource "aws_route_table_association" "public" {
-  count          = var.has_multiple_subnets ? var.public_subnet_count : length(var.availability_zones)
+  count = var.has_multiple_subnets ? var.public_subnet_count : length(var.availability_zones)
 
   subnet_id      = element(aws_subnet.public.*.id, count.index)
   route_table_id = element(aws_route_table.public.*.id, count.index)
