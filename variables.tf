@@ -13,30 +13,33 @@ variable "amis" {
   }
 }
 
-variable "instance_type" {
-  type        = string
-  description = "Instance size, default is t2.micro (free tier)"
-  default     = "t3.micro"
-}
-
 variable "web_count" {
-  type        = number
   description = "Amount of EC2 web isntances to deploy"
+  type        = number
   default     = 1
 }
 
-variable "ec2_name" {
-  type    = string
-  default = ""
+variable "instance_type" {
+  description = "Instance size, default is t2.micro (free tier)"
+  type        = string
+  default     = "t3.micro"
 }
 
-variable "ec2_environment" {
-  type    = string
-  default = "dev"
+variable "ssh_key_name" {
+  description = "SSH Key Name in AWS that will be used to access the EC2 Instance"
+  type        = string
+  default     = ""
+}
+
+variable "ec2_name" {
+  description = "Name for EC2 Instance. This will be formatted to append different values as well such as Environment; e.g. web-dev-1"
+  type        = string
+  default     = ""
 }
 
 variable "default_tags" {
-  type = map(string)
+  description = "Default tags used for all resources. This is to better consolidate billing"
+  type        = map(string)
 
   default = {
     "Business Unit" = ""
@@ -44,13 +47,13 @@ variable "default_tags" {
 }
 
 variable "cidr_block" {
-  type        = string
   description = "VPC CIDR Block used to carve up subnets"
+  type        = string
   default     = ""
 }
 
 variable "availability_zones" {
-  description = ""
+  description = "Availbility Zones to deploy subnets into"
   default     = []
 }
 variable "has_multiple_subnets" {
@@ -77,13 +80,18 @@ variable "enable_dns_hostnames" {
   default     = false
 }
 
-variable "sg_name" {
-  description = "default name for AWS Security Group"
-  type        = string
-  default     = ""
+variable "ebs_count" {
+  description = "Number of EBS Volumes to deploy and attach onto the EC2 Instance"
+  type        = number
+  default     = 0
 }
-variable "sg_description" {
-  description = "description for usage of Security Group"
-  type        = string
-  default     = ""
+
+variable "sg_ingress_ports" {
+  description = "List of ingress ports to be allowed"
+  default     = []
+}
+
+variable "sg_ingress_cidr_blocks" {
+  description = "Inbound CIDR Blocks"
+  default     = []
 }
